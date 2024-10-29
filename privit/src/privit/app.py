@@ -24,7 +24,7 @@ class Privit:
     
     async def sync_events(self):
         while True:
-            #await asyncio.sleep(0.01)
+            await asyncio.sleep(0.1)
             unread_events = await self.db.event.pop_new(id_gt=self.last_event_id)
             tasks = []
             for event in unread_events:
@@ -41,18 +41,7 @@ class Privit:
                         tasks.append(sock.send(message.json))
                         message = None
             await asyncio.gather(*tasks)
-                        #await self.db.chat_message.mark_is_read(uid=message.uid)
-            #for message_read in messages_read:
-            #    await self.db.chat_message.mark_is_read(uid=message_read.uid)
-                    #for message in messages:
-                    #    print(message)
-                    #    if sock.username == message.reader:
-                    #        await sock.send({'event':'chat_message','message':message.message,'reader':message.reader})
-        #asyncio.get_event_loop().create_task(self.sync_events())
-        #for message in unread_messages:
-        #    print(message)
-        print("Time taken for select query: {}s".format(self.db.time))
-
+            
     async def ping(self):
         while True:
             await asyncio.sleep(5)
