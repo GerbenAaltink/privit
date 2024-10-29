@@ -168,4 +168,4 @@ class App extends EventHandler {
 
 }
 
-const app = new App(window.location.href.replace(/^http/, 'ws'))
+const app = new App(window.location.href.replace(/^http/, 'ws') + 'ws/')
