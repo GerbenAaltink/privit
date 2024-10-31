@@ -38,12 +38,12 @@ async def upload_folder(folder_path):
 
 async def upload_folders(folders):
     import pathlib
-    tasks = []
-    for folder in folders:
-        for x in range(100):
-            tasks.append(upload_folder(pathlib.Path(folder).absolute()))
-    await asyncio.gather(*tasks)
+    while True:
+        tasks = []
+    
+        for folder in folders:
+            for x in range(6):
+                tasks.append(upload_folder(pathlib.Path(folder).absolute()))
+        await asyncio.gather(*tasks)
 def main():
-   
-   
    asyncio.run(upload_folders(["/home/retoor/projects/cpython/Include/", "/tmp","/var/log"]))

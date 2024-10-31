@@ -17,7 +17,7 @@ url = "http://localhost:8888/"
 
 
 async def run_app(port,verbose=False):
-    app = create_web(db_url="http://localhost:8888")
+    app = create_web(db_url="http://localhost:8887")
     app['app'].verbose = verbose
     port = get_available_port("127.0.0.1",port)
     event_loop = asyncio.get_event_loop()
@@ -31,10 +31,10 @@ async def run(verbose):
         logging.getLogger("aiohttp.server").setLevel(logging.DEBUG)   # Server logs
         logging.getLogger("aiohttp.access").setLevel(logging.DEBUG)
 
-    asyncio.create_task(run_app(8080,verbose=verbose))
+    asyncio.create_task(run_app(8084,verbose=verbose))
     await asyncio.sleep(2)
-    asyncio.create_task(run_app(8081,verbose=verbose))
-    asyncio.create_task(run_app(8082,verbose=verbose))
+    asyncio.create_task(run_app(8085,verbose=verbose))
+    asyncio.create_task(run_app(8086,verbose=verbose))
     while True:
         await asyncio.sleep(1)
 
