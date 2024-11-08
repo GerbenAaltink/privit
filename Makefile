@@ -9,7 +9,7 @@ run:
 	./venv/bin/privit
 
 utro:
-	python privit/src/utro/cli.py http://127.0.0.1:8887/
+	python privit/src/utro/cli.py http://127.0.0.1:8888/
 
 build:
 	

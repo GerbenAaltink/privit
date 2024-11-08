@@ -4,6 +4,7 @@ import time
 from datetime import datetime
 import json 
 import asyncio
+from stogram_client.client import Client as StogramClient
 class DatabaseRecord:
 
     def __init__(self, qr=None, row=None,**kwargs):
@@ -54,11 +55,11 @@ class DatabaseRecord:
             query = "UPDATE {} SET {} WHERE uid = ?".format(self._qr.table_name, ','.join(update_part))
             values.append(self.uid)
             result = await self._db.execute(query,values)
-            return result['rows_affected'] and True or False 
+            return result.rows_affected and True or False 
         else:
             query = "INSERT INTO %s (%s) VALUES (%s)" % (self._qr.table_name, ','.join(columns), ','.join(asterisks))   
             result = await self._db.execute(query,values)
-            return result['last_insert_id'] or False 
+            return result.rows_ffected and True or False 
         
     def update_created(self):
         self.data['created_date'] = datetime.now().strftime('%Y-%m-%d')
@@ -109,7 +110,7 @@ class QueryResult:
         self.success = result.get('success')
         self.rows_affected = result.get('rows_affected')
         self.insert_id = result.get('insert_id')
-        
+        self.count = result.get('count',0)
         self.rows = [DatabaseRecord(qr=self, row=record) for record in result.get('rows',[])]
 
     @property
@@ -212,10 +213,14 @@ class Database:
         self.client.verbose = val
     
     async def execute(self, sql, params=None):
+        await self.client.connect()
         if self.transaction_id is None:
             self.time_start = time.time()
         resp_start = time.time()
+        print("PREPARE: ",sql)
+        print("params",params)
         resp = await self.client.execute(sql, params or [])
+        print("EXECUTED",resp)
         qr = QueryResult(db=self, result=resp, query=sql, parameters=params or [])
         qr.time_start = resp_start
         self.time_end = time.time()
@@ -227,6 +232,7 @@ class Database:
         self.total_queries_executed +=1
         self.total_query_time += self.time 
         self.avg_query_time = self.total_query_time / self.total_queries_executed
+        print("DONE")
         return qr 
 
     def uid(self):
@@ -248,8 +254,8 @@ class Database:
         self.total_queries_executed = 0
         self.avg_query_time = 0
         self.total_query_time = 0
-        self.client = AsyncClient(url=url, verbose=False, keep_alive=False)
-        self.client.connect()
+        self.url = url 
+        self.client =StogramClient(host="127.0.0.1",port=7001)
         self.verbose = verbose
         self.transaction_id = None
         self._transaction_id = 0

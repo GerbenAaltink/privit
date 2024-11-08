@@ -13,16 +13,18 @@ from utro import AsyncClient
 from privit.db import Database
 from privit.app import Privit
 from privit.web import create_web
-url = "http://localhost:8888/"
+url = "http://localhost:7001/"
 
 
 async def run_app(port,verbose=False):
-    app = create_web(db_url="http://localhost:8887")
+    app = create_web(db_url="http://localhost:7001")
     app['app'].verbose = verbose
     port = get_available_port("127.0.0.1",port)
     event_loop = asyncio.get_event_loop()
-    app['app'].provision = port  == 8080
+    app['app'].provision = port  == 8084
     event_loop.create_task(web._run_app(app,host="0.0.0.0",port=port))
+
+
 
 async def run(verbose):
     if verbose:

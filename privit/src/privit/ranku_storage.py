@@ -1,7 +1,9 @@
 import json
 import uuid
 from typing import Any, Callable, Optional
-from utro import AsyncClient
+
+from privit.db import Database
+#from utro import AsyncClient
 from aiohttp import web
 
 from aiohttp_session import AbstractStorage, Session
@@ -37,7 +39,7 @@ class RankuStorage(AbstractStorage):
         )
         self.url = url
         self._key_factory = key_factory
-        self._client = AsyncClient(self.url)
+        self._client = Database(self.url)
 
     async def load_session(self, request: web.Request) -> Session:
         cookie = self.load_cookie(request)
@@ -47,7 +49,7 @@ class RankuStorage(AbstractStorage):
             key = str(cookie)
             
             resp = await self._client.execute("select bytes from session where key=?",[self.cookie_name + "_" + key])
-            data_bytes = resp['count'] and resp['rows'][0][0] or None
+            data_bytes = resp.count and resp.rows[0].bytes or None
             if data_bytes is None:
                 return Session(None, data=None, new=True, max_age=self.max_age)
             data_str = data_bytes
@@ -77,7 +79,7 @@ class RankuStorage(AbstractStorage):
             session.max_age,
             self.cookie_name + "_" + key
         ])
-        if(not resp['rows_affected']):
+        if(not resp.rows_affected):
             await self._client.execute("insert into session (key,bytes,ex) values (?,?,?)",[
                 self.cookie_name + "_" + key,
                 data_str,

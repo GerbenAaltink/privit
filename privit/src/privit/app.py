@@ -34,15 +34,23 @@ class Privit:
         self.web.create_task(task)
     
     async def service_chat(self):
-        async with StogramClient() as stogram_chat:
-            await stogram_chat.subscribe('chat')
-            async for ab in stogram_chat:
+        async with StogramClient(port=7001) as client:
+            
+            print(await client.subscribe('chat'))
+            print("SUBSCRIBED");
+            async for ab in client:
+                event = ab['message']
                 tasks = []
+                print(event)
                 async for sock in self.web.get_sockets():
+                    print("FOR SOCK",sock.username,event)
                     if not sock.username:
-                        continue 
-                    event = json.loads(ab['rows'][0][len(ab['rows'][0])-1])
-                    tasks.append(sock.send(event))
+                         continue 
+                    #if sock.username != event['reader']:
+                    #    continue
+                    #event = json.loads(ab['rows'][0][len(ab['rows'][0])-1])
+                    print("Matched event:",event);
+                    tasks.append(sock.send(json.dumps(event)))
                 await asyncio.gather(*tasks)
         
     async def run(self,web):

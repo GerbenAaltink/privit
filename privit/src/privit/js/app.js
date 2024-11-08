@@ -148,6 +148,8 @@ class App extends EventHandler {
         });
     }
     onMessage(event){
+        console.info(event);
+        console.info(event.data);
         const data = JSON.parse(event.data);  // Parse JSON message
         if(this.ws_promises.length){
             let ws_promise =this.ws_promises.shift()
