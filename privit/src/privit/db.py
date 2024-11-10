@@ -213,7 +213,7 @@ class Database:
         self.client.verbose = val
     
     async def execute(self, sql, params=None):
-        await self.client.connect(host="stogram",port=7001)
+        await self.client.connect()
         if self.transaction_id is None:
             self.time_start = time.time()
         resp_start = time.time()
