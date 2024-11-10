@@ -52,7 +52,7 @@ class Privit:
     async def run(self,web):
         self.web = web
         self.stogram = StogramClient("privit_publisher")
-        await self.stogram.connect(host="stogram",port=7001))
+        await self.stogram.connect(host="stogram",port=7001)
         self.last_event_id = 0
         self.db = Database(url=self.url,verbose=self.verbose)
         if self.provision:
