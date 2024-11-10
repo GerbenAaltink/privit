@@ -213,7 +213,7 @@ class Database:
         self.client.verbose = val
     
     async def execute(self, sql, params=None):
-        await self.client.connect()
+        await self.client.connect(host="stogram",port=7001)
         if self.transaction_id is None:
             self.time_start = time.time()
         resp_start = time.time()
@@ -251,7 +251,7 @@ class Database:
         self.avg_query_time = 0
         self.total_query_time = 0
         self.url = url 
-        self.client =StogramClient(host="127.0.0.1",port=7001)
+        self.client =StogramClient(host="stogram",port=7001)
         self.verbose = verbose
         self.transaction_id = None
         self._transaction_id = 0

@@ -192,7 +192,7 @@ class WebSocketView(SessionView):
 
 
 async def init_background_tasks(app):
-    app.stogram = StogramSyncClient(host="127.0.0.1",port=7001)
+    app.stogram = StogramSyncClient(host="stogram",port=7001)
     app.stogram.connect()
 
     privit = app['app']
@@ -222,7 +222,7 @@ async def start_web(app):
     site = None
     while port < 9000:
         try:
-            site = web.TCPSite(runner, '127.0.0.1', 8080)  # Specify host and port
+            site = web.TCPSite(runner, "stogram", 8080)  # Specify host and port
             await site.start()  # Start the site
         except:
             port += 1
