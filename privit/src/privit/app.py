@@ -41,21 +41,17 @@ class Privit:
             async for ab in client:
                 event = ab['message']
                 tasks = []
-                print(event)
                 async for sock in self.web.get_sockets():
-                    print("FOR SOCK",sock.username,event)
                     if not sock.username:
                          continue 
-                    #if sock.username != event['reader']:
-                    #    continue
-                    #event = json.loads(ab['rows'][0][len(ab['rows'][0])-1])
-                    print("Matched event:",event);
-                    tasks.append(sock.send(json.dumps(event)))
+                    if sock.username != event['reader']:
+                        continue
+                    tasks.append(sock.send(event))
                 await asyncio.gather(*tasks)
         
     async def run(self,web):
         self.web = web
-        self.stogram = StogramClient(name="privit_submitter")
+        self.stogram = StogramClient("privit_publisher")
         await self.stogram.connect()
         self.last_event_id = 0
         self.db = Database(url=self.url,verbose=self.verbose)

@@ -146,7 +146,7 @@ class WebHomeView(SessionView):
         if not self.request.session.get('req_id'):
             self.request.session['req_id'] = 0
         self.request.session['req_id'] += 1
-        self.request.session['much_data'] = 'a' * 3 #'a' * 1024*3
+        self.request.session['much_data'] = 'a' * 1024*3
         session = await get_session(self.request)
         
         context = {'message':'hoi {}'.format(self.request.session['req_id']),'session':json.dumps(dict(self.request.session.items()),default=str)}
@@ -164,32 +164,20 @@ class WebSocketView(SessionView):
         app = self.request.app['app']
         async for msg in sock.connection:
             if msg.type == web.WSMsgType.TEXT:
-                #self.request.app.stogram = StogramClient()
-                #async with StogramClient() as stogram_chat:
                 data = json.loads(msg.data)
                 if data['event'] == 'chat_send':
                     await app.db.chat_message.create(writer=sock.username,reader=data['reader'],message=data['message'])
-                    
-                    #await self.request.app.stogram.connect()
-                    #self.request.app.stogram.connect()
-                    #await self.request.app.stogram.publish("chat",dict(event='chat',writer=sock.username,reader=data['reader'],message=data['message'])))
-                    #self.request.app.stogram.close()
-                    #self.request.app.stogram.close()
-                    await sock.send({"event": "chat_send", "message": data['message']})
-                    print(self.request.app.stogram.publish("chat",json.loads(msg.data)))
+                    self.request.app.stogram.publish("chat",data)
                 
                 if data['event'] == 'get_events':
                     events = await app.db.event.get_new()
-                    print("Before sent event")
                     await sock.send({"event": "get_events", "events": events})
-                    print("Sent events")
                 if data['event'] == 'get_messages':
                     messages = await app.db.chat_message.get(reader=sock.username,limit=30)
                     messages.sort(key=lambda x: x['id'], reverse=False)
                     await sock.send({'event':'chat_messages','messages':[message.json for message in messages]})
                 if data['event'] == 'login':
                     self.request.session.update(username=data.get('username'))
-                    print("JAAA")
                     await sock.login(data.get('username'),data.get('password'))
                     await sock.send({"event": "login","req_id":self.session.get('req_id'), "username": data['username'],'success':True})
                 
@@ -202,23 +190,13 @@ class WebSocketView(SessionView):
         print("WebSocket connection closed")
         return ws
 
-async def provision(app):
-    await asyncio.sleep(2)
-    if app.get('port') == 8084:
-        await app['app'].delete_schema()
-        await app['app'].provision()
-    
-        print("Privisioned")
 
 async def init_background_tasks(app):
     app.stogram = StogramSyncClient(host="127.0.0.1",port=7001)
     app.stogram.connect()
 
     privit = app['app']
-    #await app.create_task(privit.run(web=app))
     
-    await provision(app)
-    asyncio.create_task(provision(app))
     app['background_task'] = asyncio.create_task(privit.run(web=app))
 
 class PrivetRunner(web.AppRunner):

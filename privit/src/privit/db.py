@@ -217,10 +217,7 @@ class Database:
         if self.transaction_id is None:
             self.time_start = time.time()
         resp_start = time.time()
-        print("PREPARE: ",sql)
-        print("params",params)
         resp = await self.client.execute(sql, params or [])
-        print("EXECUTED",resp)
         qr = QueryResult(db=self, result=resp, query=sql, parameters=params or [])
         qr.time_start = resp_start
         self.time_end = time.time()
@@ -232,7 +229,6 @@ class Database:
         self.total_queries_executed +=1
         self.total_query_time += self.time 
         self.avg_query_time = self.total_query_time / self.total_queries_executed
-        print("DONE")
         return qr 
 
     def uid(self):

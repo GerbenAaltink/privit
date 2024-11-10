@@ -33,7 +33,7 @@ class ChatComponent extends HTMLElement {
         let me = this 
 
         this.shadowRoot.appendChild(this.container)
-        app.addEventListener("chat",(data)=>{
+        app.addEventListener("chat_send",(data)=>{
             let chatbox = me.messages
             let message = document.createElement("div")
             message.classList.add('message')
