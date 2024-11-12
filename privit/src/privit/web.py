@@ -167,6 +167,7 @@ class WebSocketView(SessionView):
                 data = json.loads(msg.data)
                 if data['event'] == 'chat_send':
                     await app.db.chat_message.create(writer=sock.username,reader=data['reader'],message=data['message'])
+                    data['writer'] = sock.username
                     self.request.app.stogram.publish("chat",data)
                 
                 if data['event'] == 'get_events':
