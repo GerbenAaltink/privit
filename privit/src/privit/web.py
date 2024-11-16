@@ -186,7 +186,13 @@ class WebSocketView(SessionView):
             elif msg.type == web.WSMsgType.ERROR:
                 self.request.app.sockets.remove(sock)
                 print(f"WebSocket connection closed with exception: {ws.exception()}")
-                exit(0)
+                break
+
+            elif msg.type in [web.WSMsgType.CLOSE,web.WSMsgType.CLOSED,web.WSMsgType.CLOSING]:
+                print("WebSocket closed by client gracefully.")
+                break
+
+        self.request.app.sockets.remove(sock)       
         #sockets.remove(sock)
         print("WebSocket connection closed")
         return ws
